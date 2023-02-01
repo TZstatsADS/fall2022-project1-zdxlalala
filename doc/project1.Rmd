@@ -1,0 +1,79 @@
+---
+title: "Project1"
+author:
+- name: Dongxu Zhang
+output:
+  html_document:
+    df_print: paged
+---
+
+The "History of Philosophy" dataset on Kaggle provides a comprehensive overview of the major philosophers and philosophical schools from Ancient Greece to the Modern era. With over 300000 rows of data, this dataset provides a good entry point for people interested in the history of philosophy and the thinkers who shaped it.
+
+The data includes details such as the philosopher's name, birth and death dates, nationality, main philosophical contribution, and a brief biography. The philosophers are also grouped into their respective philosophical schools, such as Stoicism, Epicureanism, and Cynicism, which makes it easier to see the relationships between different philosophers and their influences on each other.
+
+```{r, message=FALSE, warning=FALSE}
+packages.used=c("tm", "wordcloud", "RColorBrewer", "dplyr", "tidytext")
+# check packages that need to be installed.
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                        packages.used))
+# install additional packages
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE,
+                   repos='http://cran.us.r-project.org')
+}
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+library(dplyr)
+library(tidytext)
+library(knitr)
+library(ggplot2)
+library(stringr)
+source("../lib/plotFuncs.R")
+```
+
+
+```{r}
+data<-read.csv("../data/philosophy_data.csv")
+```
+
+
+First I want to get an overview of the data and I am very interested in how these sentences are distributed among philosophers. This is achieved and showed in following histogram.
+```{r}
+author_count<-data.frame(table(data$author))
+plt <- ggplot(author_count) + geom_bar(aes(x=Var1, y=Freq), stat="identity") + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + xlab("Author") + ylab("Sentence Count") + labs(title="Word Count by Author")
+print(plt)
+```
+From the histogram, we can see that Aristotle and Plato took the majority of those sentences with significantly larger sentences counts. This agree with my intuition since when talked about philosophy, Aristotle and Plato are always among the first few names that come to people's mind. As a result of this, instead of go through all the philosophers and their works in this data. I am more interested in diving deeper into these two representative figures by analyzing and comparing their sentences from several perspectives.
+
+The first aspect I want to know is what are the frequent words of these two philosophers. To learn this I created two histogram for frequent words count (appears at least 1000 times in all sentences).
+```{r, warning=FALSE}
+plot.word_count("Aristotle")
+```
+From above Aristotle's frequent words count histogram we can find that the top words he used to use in his literature are "one", "will", "things", "must", "also", "man". From the literature class I took and researches I did online, Aristotle's writing style is characterized by clarity, conciseness, and systematic organization. He used deductive reasoning, examples, and analogies to explain complex ideas in a straightforward manner, and he often presented his ideas in the form of syllogisms. The use of these frequent words again makes sense with such a writing style.
+
+Now it's time to take a look at Plato's frequent words. The same histogram is rendered according to Plato's sentences.
+
+```{r, warning=FALSE}
+plot.word_count("Plato")
+```
+From the above histogram, one clear difference from Aristotle's histogram is that the number of frequent words (>1000 usage) Plato used are way more less than Aristotle's. This suggests that Aristotle is more diverse than Plato when choosing words for his literature, but this may also result from that Aristotle has larger sentences counts than Plato. Looking at top frequent words that Plato used, we can easily find that they are "one", "will", "things", "say", "good". They are pretty similar to the top frequent words of Aristotle. One of the fact we should know that Aristotle is the student of Plato, even though unlike Plato, Aristotle did not believe in a transcendent realm of Forms, but saw the physical world as real and knowable, we can still see that how Plato's works influenced Aristotle from this analysis.
+
+I also plot the word cloud representation of Aristotle and Plato so we can get a better visualization of what we just discovered.
+
+World Cloud for Aristotle
+```{r, warning=FALSE}
+plot.word_cloud("Aristotle")
+```
+
+World Cloud for Plato
+```{r, warning=FALSE}
+plot.word_cloud("Plato")
+```
+
+Since the world cloud representations provides us a clearer and better visualization of frequent words used by Aristotle and Plato. I noticed that even though top frequent words are pretty similar, there are plenty of different words in the surrounding area. These words represent the different point of views expressed in their works.
+
+Overall, both Aristotle and Plato made significant contributions to philosophy, and Plato takes an important role as Aristotle teacher and influenced his use of word according to our analyze, but their views on reality, the role of government, and the path to knowledge differed significantly with support from words differences in the word cloud.
+
+In conclusion, the "History of Philosophy" dataset provides a comprehensive and accessible overview of the major philosophers and philosophical schools throughout history. A lots more features are worthy to be analyzed and dicussed further.
